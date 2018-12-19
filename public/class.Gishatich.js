@@ -1,86 +1,126 @@
-class Gishatich extends LivingCreature {
+class Gishatich extends Base {
+
     constructor(x, y, index) {
-        super(x, y, index)
-        this.energy = 8;
+        super(x, y, index);
+        this.energy = Math.round(random(4, 7));
+        this.gender = Math.round(random(1, 2));
     }
 
-    move() {
+    getNewCoordinates() {
+        this.directions =
+            [
+                [this.x - 1, this.y - 1],
+                [this.x, this.y - 1],
+                [this.x + 1, this.y - 1],
+                [this.x - 1, this.y],
+                [this.x + 1, this.y],
+                [this.x - 1, this.y + 1],
+                [this.x, this.y + 1],
+                [this.x + 1, this.y + 1]
+            ];
+    }
+
+    chooseCell(character) {
         this.getNewCoordinates();
+        return super.chooseCell(character);
+    }
 
-        var norVandak = this.yntrelVandak(0);
-        var newCell = random(norVandak);
 
-        if (newCell) {
-            this.energy--;
+    move() {
+        var emptyCells = this.chooseCell(0);
+        var randomCell = random(emptyCells);
+        this.energy--;
+
+        if (randomCell) {
+            var newX = randomCell[0];
+            var newY = randomCell[1];
+
             matrix[this.y][this.x] = 0;
-            this.x = newCell[0];
-            this.y = newCell[1];
-            matrix[this.y][this.x] = 3;
+            matrix[newY][newX] = 3;
 
-            if (this.energy <= 0) {
-                this.die();
-            }
-
+            this.y = newY;
+            this.x = newX;
+        }
+        if (this.energy <= 0) {
+            this.die();
+        }
+        else if (this.energy >= 10) {
+            this.mul();
         }
 
     }
 
+
+
     eat() {
-        this.getNewCoordinates();
-        var norVandak = this.yntrelVandak(2);
-        var newCell = random(norVandak);
+        var emptyCells = this.chooseCell(2);
+        var randomCell = random(emptyCells);
+        
+        if (randomCell) {
+            var newX = randomCell[0];
+            var newY = randomCell[1];
 
-        if (newCell) {
-            this.energy++;
-
-            for (var i in xotakerArr) {
-                if (newCell[0] == xotakerArr[i].x && newCell[1] == xotakerArr[i].y) {
-                    xotakerArr.splice(i, 1);
+            for (var i in eaterArr) {
+                if (newX == eaterArr[i].x && newY == eaterArr[i].y) {
+                    eaterArr.splice(i, 1);
                     break;
                 }
             }
 
+
             matrix[this.y][this.x] = 0;
-            this.x = newCell[0];
-            this.y = newCell[1];
-            matrix[this.y][this.x] = 3;
+            matrix[newY][newX] = 3;
 
 
+            this.y = newY;
+            this.x = newX;
 
-            if (this.energy >= 12) {
-                this.mul();
-            }
+            this.energy++;
 
         }
         else {
             this.move();
-
-        }
-
-    }
-
-
-    mul() {
-
-        var norVandak = this.yntrelVandak(0);
-        var newCell = random(norVandak);
-
-        if (newCell) {
-            var newgishatich = new Gishatich(newCell[0], newCell[1], this.index);
-            gishatichArr.push(newgishatich);
-            matrix[newCell[1]][newCell[0]] = 3;
-            this.energy = 6;
         }
     }
+
+
+
     die() {
-        for (var i in gishatichArr) {
-            if (this.x == gishatichArr[i].x && this.y == gishatichArr[i].y) {
-                gishatichArr.splice(i, 1);
-                matrix[this.y][this.x] = 0;
+
+        for (var i in gishatArr) {
+            if (this.x == gishatArr[i].x && this.y == gishatArr[i].y) {
+                gishatArr.splice(i, 1);
                 break;
             }
         }
 
+        matrix[this.y][this.x] = 0;
+
+
 
     }
+
+    mul() {
+        var emptyCells = this.chooseCell(0);
+        var randomCell = random(emptyCells);
+        if (randomCell) {
+            var newX = randomCell[0];
+            var newY = randomCell[1];
+
+            matrix[this.y][this.x] = 0;
+            matrix[newY][newX] = 3;
+
+            var newgishat = new Gishatich(newX, newY, 3);
+            gishatArr.push(newgishat);
+            this.energy = Math.round(random(1, 5));
+        }
+
+        function gishatmul() {
+            statistics.mul++;
+            
+        }
+        gishatmul();
+    }
+
 }
+//dsds

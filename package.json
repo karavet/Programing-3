@@ -1,26 +1,24 @@
 {
-  "name": "Programing-3",
+  "name": "programing-3",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "start":"node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/karavet/Programing-3.git"
   },
-  "author": "karavet",
+  "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/hanumanum/test-heroku-gol/issues"
+    "url": "https://github.com/karavet/Programing-3/issues"
   },
-  "homepage": "https://tumotestgol.herokuapp.com/",
+  "homepage": "https://github.com/karavet/Programing-3#readme",
   "dependencies": {
-    "express": "^4.16.2"
-  },
-  "engines": {
-    "node": "4.7.2"
+    "express": "^4.16.4",
+    "socket.io": "^2.2.0"
   }
 }

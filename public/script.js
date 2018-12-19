@@ -1,30 +1,66 @@
+
+var socket = io.connect('http://localhost:3000');
+var statistics = {
+    "timestamp": "",
+    "framecount": 0,
+    "becomeFlower":0,   
+    "die":0,            
+    "mul":0,            
+    "energy":0,         
+    "treeEnergy":0      
+}
+
+var weather = 0;
+
+var side = 20;
+
+var grassArr = [];
+
+var eaterArr = [];
+
+var gishatArr = [];
+
+var folwerArr = [];
+
+var treeArr =[];
+
+var matrix = [];
+
+var bbbb  = document.getElementById("bbbb")
+bbbb.style.height = 0
+/**/
 function setup() {
-    var a = [0, 1, 2, 3, 1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 2, 2, 2, 0, 0, 1];
-    x = 50;
-    y = 50;
-    matrix = [];
-    for (var i = 0; i < y; i++) {
-        matrix[i] = [];
-        for (var k = 0; k < x; k++) {
-            matrix[i][k] = a[Math.floor(a.length * Math.random())];
+
+    var n = Math.round(random(15, 30));
+    var m = Math.round(random(15, 30));
+
+    for (var y = 0; y < n; ++y) {
+        matrix[y] = [];
+        for (var x = 0; x < m; ++x) {
+            var rand = random(400);
+            if(rand<20){
+                 var r = 0;
+            }
+            else if(21<rand  && rand<100){
+                 var r = 1;
+            }
+            else if(101<rand && rand<300){
+                var r = 2;
+            }
+            else if(301<rand && rand<350){
+                var r = 3;
+            }
+            else if(351<rand && rand<401){
+                r = 4;
+            }
+            matrix[y][x] = r;
         }
     }
 
-
-
-    side = 20;
-
-    grassArr = [];
-    rainArr = [];
-    xotakerArr = [];
-    gishatichArr = [];
-    hunterArr = [];
-
-    frameRate(2);
+    frameRate(3);
     createCanvas(matrix[0].length * side, matrix.length * side);
     background('#acacac');
 
-    rainArr.push(new rain());
 
     for (var y = 0; y < matrix.length; ++y) {
         for (var x = 0; x < matrix[y].length; ++x) {
@@ -33,54 +69,117 @@ function setup() {
                 grassArr.push(gr);
             }
             else if (matrix[y][x] == 2) {
-                var gr = new GrassEater(x, y, 2);
-                xotakerArr.push(gr);
-            }
-
-            else if (matrix[y][x] == 5) {
-                var gr = new hunter(x, y, 5);
-                xotakerArr.push(gr);
-
+                var eater = new GrassEater(x, y, 2);
+                eaterArr.push(eater);
             }
             else if (matrix[y][x] == 3) {
-                var gr = new Gishatich(x, y, 3);
-                gishatichArr.push(gr);
+                var gish = new Gishatich(x, y, 3);
+                gishatArr.push(gish);
             }
-            else if (matrix[y][x] == 8) {
-
+            
+            else if (matrix[y][x] == 5) {
+                var flow = new Flower(x, y, 5);
+                folwerArr.push(flow);
+            }
+            else if (matrix[y][x] == 6) {
+                var newTree = new Tree(x, y, 6);
+                treeArr.push(newTree);
             }
         }
     }
 
-
 }
 
 
+var count = 0;
+
+
 function draw() {
-    background("#acacac");
-
-    for (var i in rainArr) {
-        rainArr[i].mul();
-
+    
+    if (frameCount % 50 == 0) {
+        statistics.timestamp = (new Date()).toString();
+        statistics.framecount = frameCount;
+        socket.emit("send data", statistics);
+        // console.log(frameCount);
     }
+    count++;
+    if (count < 11) {
+        weather = 0;
+        console.log("winter");
+    }
+    else if (count < 21) {
+        weather = 1;
+        console.log("spring");
+    }
+    else if (count < 31) {
+        weather = 2;
+        console.log("summer");
+    }
+    else if (count < 41) {
+        weather = 3;
+        console.log("autumn");
+    }
+    else {
+        count = 0;
+    }
+    drawMatrix();
+
     for (var i in grassArr) {
         grassArr[i].mul();
+        if (count % 5 == 0) {
+            grassArr[i].becomeFlower();
+        }
+        if (weather==0) {
+            grassArr[i].becomeTree();
+        }
+    }
+    for (var i in eaterArr) {
+        eaterArr[i].eat();
+    }
+    for (var i in gishatArr) {
+        gishatArr[i].eat();
+    }
+    for (var i in folwerArr) {
+        folwerArr[i].changeEnergy();
+    }
+   
+    for (var i in treeArr) {
+        treeArr[i].changeEnergy();
+    }
+    
 
+    
+    bbbb.style.height=parseInt(bbbb.style.height.split("px")[0]) + 20 +"px"
+
+    function timedRefresh(timeoutPeriod) {
+        setTimeout("location.reload(true);",timeoutPeriod);
     }
-    for (var i in xotakerArr) {
-        xotakerArr[i].eat();
-    }
-    for (var i in gishatichArr) {
-        gishatichArr[i].eat();
-    }
-    for (var i in hunterArr) {
-        hunterArr[i].eat();
-    }
+    
+    window.onload = timedRefresh(17000);
+    
+}
+
+function drawMatrix() {
     for (var y = 0; y < matrix.length; y++) {
         for (var x = 0; x < matrix[y].length; x++) {
 
             if (matrix[y][x] == 1) {
-                fill("green");
+                if (weather == 0) {
+                    fill("white");
+                }
+                else if (weather == 1) {
+                    fill("#cfe08d");
+                }
+                else if (weather == 2) {
+                    fill("#459305");
+                }
+                else {
+                    fill("#9e7d2c")
+                }
+                rect(x * side, y * side, side, side);
+            }
+            else if (matrix[y][x] == 0) {
+                fill("#acacac");
                 rect(x * side, y * side, side, side);
             }
             else if (matrix[y][x] == 2) {
@@ -91,25 +190,25 @@ function draw() {
                 fill("red");
                 rect(x * side, y * side, side, side);
             }
-            else if (matrix[y][x] == 4) {
-                fill("aqua");
-                rect(x * side, y * side, side, side);
-            }
             else if (matrix[y][x] == 5) {
-                fill("black");
+                if (weather == 1) {
+                    fill("pink");
+                }
+                else if (weather == 2) {
+                    fill("#ad0d15");
+                }
+                else if (weather == 3) {
+                    fill("#e5743b");
+                }
+
                 rect(x * side, y * side, side, side);
             }
-
-            else if (matrix[y][x] == 0) {
-                fill("#acacac");
+            else if (matrix[y][x] == 6) {
+                fill("#0c4a6b");
                 rect(x * side, y * side, side, side);
             }
-
         }
     }
-
-
-
-
 }
+
 
