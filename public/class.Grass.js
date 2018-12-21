@@ -1,5 +1,5 @@
 
-class Grass extends Base {
+class Grass extends Grass {
     constructor(x, y, index) {
         super(x, y, index);
         this.multiply = Math.round(random(0, 7));
@@ -65,4 +65,3 @@ class Grass extends Base {
     }
 
 }
-//wddwd

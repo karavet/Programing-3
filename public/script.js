@@ -1,5 +1,5 @@
 
-var socket = io.connect('http://localhost:3000');
+socket = io;
 var statistics = {
     "timestamp": "",
     "framecount": 0,
@@ -9,6 +9,11 @@ var statistics = {
     "energy":0,         
     "treeEnergy":0      
 }
+var stat;
+
+socket.on("stats", function (stats) {
+    stat = stats;
+});
 
 var weather = 0;
 
@@ -28,7 +33,6 @@ var matrix = [];
 
 var bbbb  = document.getElementById("bbbb")
 bbbb.style.height = 0
-/**/
 function setup() {
 
     var n = Math.round(random(15, 30));
